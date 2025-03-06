@@ -1,6 +1,7 @@
 const { exec } = require('child_process')
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
+const fs = require('fs')
 
 const DEFAULTS = {
 	imagePath: './images',
@@ -54,6 +55,10 @@ function createVideoFromImages(
 	// Calculate the effective frame rate for input images
 	const effectiveFramerate = 1 / imageDuration
 	const command = `ffmpeg -framerate ${effectiveFramerate} -i "${imagePath}/${imagePattern}" -vf "fps=${fps}" -c:v libx264 -pix_fmt yuv420p "${outputVideo}"`
+  // Delete output video if it exists
+  if (fs.existsSync(outputVideo)) {
+    fs.unlinkSync(outputVideo)
+  }
 
 	exec(command, (error, stdout, stderr) => {
 		if (error) {
